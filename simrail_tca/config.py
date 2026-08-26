@@ -55,6 +55,7 @@ class Profile:
                         decrease_key=entry["decrease_key"],
                         calibration=calibration,
                         hysteresis=float(entry.get("hysteresis", 0.15)),
+                        current_notch=int(entry.get("initial_notch", 0)),
                     )
                 elif mode == "zones":
                     zones = []

@@ -71,6 +71,27 @@ class NotchedAxisTest(unittest.TestCase):
         self.assertEqual(len(ax.update(0.45)), 1)
         self.assertEqual(ax.current_notch, 2)
 
+    def test_initial_notch_mid_range(self):
+        # Combined traction/ED lever: neutral in the middle of the range.
+        ax = NotchedAxis(
+            name="zadajnik", positions=21,
+            increase_key="num_add", decrease_key="num_subtract",
+            calibration=Calibration(min=0.0, max=1.0),
+            current_notch=10,
+        )
+        self.assertEqual(ax.update(0.5), [])  # lever at neutral: nothing
+        taps = ax.update(0.0)  # pull fully back into ED braking
+        self.assertEqual([t.key for t in taps], ["num_subtract"] * 10)
+        self.assertEqual(ax.current_notch, 0)
+
+    def test_initial_notch_clamped(self):
+        ax = NotchedAxis(
+            name="t", positions=5,
+            increase_key="num_add", decrease_key="num_subtract",
+            current_notch=99,
+        )
+        self.assertEqual(ax.current_notch, 4)
+
     def test_resync(self):
         ax = self.make(positions=5)
         ax.update(1.0)

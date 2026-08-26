@@ -8,7 +8,7 @@ REPO = Path(__file__).resolve().parent.parent
 
 class ProfileTest(unittest.TestCase):
     def test_shipped_profiles_load(self):
-        for name in ("eu07.json", "en76.json"):
+        for name in ("bez-ed.json", "z-ed.json"):
             profile = load_profile(REPO / "config" / name)
             self.assertTrue(profile.notched_axes or profile.zones_axes,
                             f"{name}: no axes configured")

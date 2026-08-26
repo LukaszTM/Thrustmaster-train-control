@@ -1,5 +1,5 @@
 {
-  "_info": "Profil EU07/EP07/EP08 - nastawnik skokowy na osi 0, hamulce strefowo na osiach 1-2. Numery osi/przyciskow sprawdz komenda: python -m simrail_tca monitor",
+  "_info": "Pojazdy BEZ hamulca elektrodynamicznego (EU07, EP07, EP08, ET22, ET41). Dzwignia 1 = nastawnik skokowy, dzwignia 2 = kran hamulca zespolonego, hamulec dodatkowy lokomotywy na przyciskach. Numery osi/przyciskow sprawdz komenda: python -m simrail_tca monitor --config config/bez-ed.json",
   "device": {
     "name_contains": "TCA"
   },
@@ -12,6 +12,7 @@
       "name": "nastawnik",
       "mode": "notched",
       "positions": 44,
+      "initial_notch": 0,
       "increase_key": "num_add",
       "decrease_key": "num_subtract",
       "hysteresis": 0.2,
@@ -32,7 +33,8 @@
   "buttons": [
     { "button": 0, "name": "czuwak_shp", "action": "tap",  "key": "space" },
     { "button": 1, "name": "syrena",     "action": "hold", "key": "q" },
-    { "button": 2, "name": "piasecznica","action": "hold", "key": "num8" },
-    { "button": 3, "name": "resync_nastawnika", "action": "resync", "resync_axis": "nastawnik", "resync_notch": 0 }
+    { "button": 2, "name": "hamulec_dodatkowy_hamowanie", "action": "hold", "key": "num1" },
+    { "button": 3, "name": "hamulec_dodatkowy_luzowanie", "action": "hold", "key": "num7" },
+    { "button": 4, "name": "resync_nastawnika", "action": "resync", "resync_axis": "nastawnik", "resync_notch": 0 }
   ]
 }

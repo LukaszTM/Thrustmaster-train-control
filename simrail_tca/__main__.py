@@ -2,9 +2,9 @@
 
 Usage:
     python -m simrail_tca devices
-    python -m simrail_tca monitor  [--config config/eu07.json]
-    python -m simrail_tca calibrate --config config/eu07.json
-    python -m simrail_tca run      --config config/eu07.json [--dry-run] [-v]
+    python -m simrail_tca monitor  [--config config/bez-ed.json]
+    python -m simrail_tca calibrate --config config/bez-ed.json
+    python -m simrail_tca run      --config config/z-ed.json [--dry-run] [-v]
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ import sys
 from .config import ConfigError, load_profile
 from .keysender import make_sender
 
-DEFAULT_CONFIG = "config/eu07.json"
+DEFAULT_CONFIG = "config/bez-ed.json"
 
 
 def _open_from_profile(profile) -> "object":

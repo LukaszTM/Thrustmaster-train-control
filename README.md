@@ -22,8 +22,8 @@ które gra widzi tak samo jak prawdziwą klawiaturę).
   klawisz A, wyłącz → klawisz B) oraz `resync` (patrz niżej).
 - **Kalibracja** — kreator zapisuje rzeczywisty zakres i kierunek każdej osi do
   profilu.
-- **Profile** — osobne pliki JSON dla różnych lokomotyw (`config/eu07.json`,
-  `config/en76.json`); łatwo dodać własne.
+- **Profile** — osobne pliki JSON dla pojazdów z hamulcem elektrodynamicznym
+  (`config/z-ed.json`) i bez niego (`config/bez-ed.json`); łatwo dodać własne.
 - **Tryb testowy** (`--dry-run`) — wypisuje zdarzenia klawiszy zamiast je wysyłać.
 
 ## Wymagania
@@ -42,6 +42,22 @@ cd Thrustmaster-train-control
 pip install -r requirements.txt
 ```
 
+## Wybór profilu: z hamulcem ED czy bez?
+
+| Profil | Pojazdy | Układ dźwigni |
+|---|---|---|
+| `config/bez-ed.json` | EU07, EP07, EP08, ET22, ET41 | dźwignia 1 = **nastawnik skokowy** (śledzenie pozycji, 44 pozycje), dźwignia 2 = kran hamulca zespolonego, hamulec dodatkowy lokomotywy na przyciskach (`Num 1`/`Num 7`) |
+| `config/z-ed.json` | EN76/EN96 Elf, ET25 Dragon2, E186 Traxx | dźwignia 1 = **zespolony zadajnik jazdy i hamowania ED**: do przodu = więcej mocy, środek = utrzymanie, do tyłu = redukcja mocy przechodząca w hamowanie elektrodynamiczne (w SimRail zakres poniżej zera na tym samym klawiszu `Num -`), dźwignia 2 = kran hamulca zespolonego (pneumatycznego) |
+
+W pojazdach z ED na co dzień hamujesz dźwignią 1 (jak w prawdziwym Elfie czy
+Dragonie — cofnięcie zadajnika poniżej zera załącza hamulec ED), a kran na
+dźwigni 2 służy do zatrzymania i sytuacji awaryjnych.
+
+W pojazdach bez ED nastawnik jest skokowy: program śledzi pozycję w grze i na
+każdą pozycję różnicy wysyła jedno naciśnięcie klawisza. Jeśli wolisz sterowanie
+strefowe („dźwignia do przodu = klawisz trzymany"), zmień `mode` na `zones` jak
+w profilu `z-ed.json`.
+
 ## Pierwsze uruchomienie — krok po kroku
 
 **1. Sprawdź, czy kontroler jest widoczny:**
@@ -57,7 +73,7 @@ w pliku profilu.
 **2. Zidentyfikuj numery osi i przycisków** (poruszaj dźwigniami, wciskaj przyciski):
 
 ```bat
-python -m simrail_tca monitor --config config/eu07.json
+python -m simrail_tca monitor --config config/bez-ed.json
 ```
 
 Wpisz właściwe numery w polach `axis` / `button` profilu.
@@ -65,7 +81,7 @@ Wpisz właściwe numery w polach `axis` / `button` profilu.
 **3. Skalibruj osie:**
 
 ```bat
-python -m simrail_tca calibrate --config config/eu07.json
+python -m simrail_tca calibrate --config config/bez-ed.json
 ```
 
 Dla każdej osi: przesuń dźwignię w pełnym zakresie, zostaw ją w pozycji
@@ -74,16 +90,16 @@ minimalnej (jałowej) i naciśnij Enter. Wynik zapisuje się do pliku profilu.
 **4. Przetestuj bez gry:**
 
 ```bat
-python -m simrail_tca run --config config/eu07.json --dry-run -v
+python -m simrail_tca run --config config/bez-ed.json --dry-run -v
 ```
 
 **5. Uruchom SimRail i mostek:**
 
 ```bat
-python -m simrail_tca run --config config/eu07.json
+python -m simrail_tca run --config config/bez-ed.json
 ```
 
-albo po prostu `run.bat` (opcjonalnie `run.bat config\en76.json`).
+albo po prostu `run.bat` (opcjonalnie `run.bat config\z-ed.json`).
 
 > **Ważne:** w trybie `notched` program nie wie, gdzie faktycznie stoi nastawnik
 > w grze — zaczyna od pozycji 0. Przed startem ustaw nastawnik w grze na 0
@@ -92,7 +108,7 @@ albo po prostu `run.bat` (opcjonalnie `run.bat config\en76.json`).
 
 ## Konfiguracja profilu
 
-Przykład (`config/eu07.json`):
+Przykład (`config/bez-ed.json`):
 
 ```json
 {
@@ -136,6 +152,7 @@ Przykład (`config/eu07.json`):
 | `poll_hz` | częstotliwość odczytu kontrolera |
 | `key_tap_ms` / `key_gap_ms` | czas wciśnięcia klawisza i przerwa między kolejnymi naciśnięciami (zwiększ, jeśli gra „gubi" naciśnięcia) |
 | `positions` | liczba pozycji nastawnika w trybie `notched` |
+| `initial_notch` | pozycja startowa w trybie `notched` (domyślnie 0; ustaw środkową dla dźwigni z neutrum w środku zakresu, np. zadajnika z ED lub kranu z pozycją „jazda") |
 | `hysteresis` | część szerokości pozycji (0–0.4) tłumiąca drgania osi |
 | `zones` | strefy 0.0–1.0 po kalibracji; `key: null` = strefa martwa |
 | `calibration` | wypełnia kreator `calibrate`; `invert` odwraca kierunek osi |

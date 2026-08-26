@@ -63,7 +63,14 @@ class NotchedAxis:
     decrease_key: str
     calibration: Calibration = field(default_factory=Calibration)
     hysteresis: float = 0.15  # fraction of one notch width
+    # Notch the in-game lever is assumed to start at. 0 for controllers
+    # resting at the bottom of their range; mid-range for combined
+    # traction/ED-brake levers or brake valves whose neutral sits in the
+    # middle.
     current_notch: int = 0
+
+    def __post_init__(self) -> None:
+        self.current_notch = max(0, min(self.positions - 1, self.current_notch))
 
     def resync(self, notch: int = 0) -> None:
         self.current_notch = max(0, min(self.positions - 1, notch))
