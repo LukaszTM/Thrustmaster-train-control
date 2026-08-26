@@ -1,0 +1,38 @@
+{
+  "_info": "Profil EU07/EP07/EP08 - nastawnik skokowy na osi 0, hamulce strefowo na osiach 1-2. Numery osi/przyciskow sprawdz komenda: python -m simrail_tca monitor",
+  "device": {
+    "name_contains": "TCA"
+  },
+  "poll_hz": 60,
+  "key_tap_ms": 40,
+  "key_gap_ms": 60,
+  "axes": [
+    {
+      "axis": 0,
+      "name": "nastawnik",
+      "mode": "notched",
+      "positions": 44,
+      "increase_key": "num_add",
+      "decrease_key": "num_subtract",
+      "hysteresis": 0.2,
+      "calibration": { "min": -1.0, "max": 1.0, "invert": true }
+    },
+    {
+      "axis": 1,
+      "name": "hamulec_zespolony",
+      "mode": "zones",
+      "calibration": { "min": -1.0, "max": 1.0, "invert": true },
+      "zones": [
+        { "from": 0.0,  "to": 0.35, "key": "num9" },
+        { "from": 0.35, "to": 0.65, "key": null },
+        { "from": 0.65, "to": 1.0,  "key": "num3" }
+      ]
+    }
+  ],
+  "buttons": [
+    { "button": 0, "name": "czuwak_shp", "action": "tap",  "key": "space" },
+    { "button": 1, "name": "syrena",     "action": "hold", "key": "q" },
+    { "button": 2, "name": "piasecznica","action": "hold", "key": "num8" },
+    { "button": 3, "name": "resync_nastawnika", "action": "resync", "resync_axis": "nastawnik", "resync_notch": 0 }
+  ]
+}

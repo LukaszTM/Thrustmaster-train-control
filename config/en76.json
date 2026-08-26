@@ -1,0 +1,37 @@
+{
+  "_info": "Profil EN76/EN96 Elf - zadajnik jazdy/hamowania sterowany strefowo: wychylenie dzwigni do przodu zwieksza, do tylu zmniejsza. Numery osi/przyciskow sprawdz komenda: python -m simrail_tca monitor",
+  "device": {
+    "name_contains": "TCA"
+  },
+  "poll_hz": 60,
+  "key_tap_ms": 40,
+  "key_gap_ms": 60,
+  "axes": [
+    {
+      "axis": 0,
+      "name": "zadajnik",
+      "mode": "zones",
+      "calibration": { "min": -1.0, "max": 1.0, "invert": true },
+      "zones": [
+        { "from": 0.0,  "to": 0.15, "key": "num_subtract" },
+        { "from": 0.15, "to": 0.85, "key": null },
+        { "from": 0.85, "to": 1.0,  "key": "num_add" }
+      ]
+    },
+    {
+      "axis": 1,
+      "name": "hamulec_zespolony",
+      "mode": "zones",
+      "calibration": { "min": -1.0, "max": 1.0, "invert": true },
+      "zones": [
+        { "from": 0.0,  "to": 0.35, "key": "num9" },
+        { "from": 0.35, "to": 0.65, "key": null },
+        { "from": 0.65, "to": 1.0,  "key": "num3" }
+      ]
+    }
+  ],
+  "buttons": [
+    { "button": 0, "name": "czuwak_shp", "action": "tap",  "key": "space" },
+    { "button": 1, "name": "syrena",     "action": "hold", "key": "q" }
+  ]
+}
