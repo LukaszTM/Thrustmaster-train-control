@@ -1,1 +1,4 @@
 pygame>=2.5
+# Only needed for the Xbox-emulation mode (python -m simrail_tca xbox);
+# also requires the ViGEmBus driver on Windows.
+vgamepad>=0.1 ; sys_platform == "win32"

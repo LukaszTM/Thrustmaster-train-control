@@ -1,0 +1,41 @@
+{
+  "_info": "Tryb emulacji pada Xbox 360 (wymaga sterownika ViGEmBus + pip install vgamepad). Osie TCA -> analogi pada, przyciski TCA -> przyciski pada. Cele osi: left_stick_x/y, right_stick_x/y, left_trigger, right_trigger. Cele przyciskow: a, b, x, y, lb, rb, back, start, guide, ls, rs, dpad_up/down/left/right. Numery osi/przyciskow sprawdz: python -m simrail_tca monitor --config config/bez-ed.json",
+  "device": {
+    "name_contains": "TCA"
+  },
+  "poll_hz": 120,
+  "axes": [
+    {
+      "axis": 0,
+      "target": "left_stick_y",
+      "deadzone": 0.05,
+      "calibration": { "min": -1.0, "max": 1.0, "invert": true }
+    },
+    {
+      "axis": 1,
+      "target": "right_stick_y",
+      "deadzone": 0.05,
+      "calibration": { "min": -1.0, "max": 1.0, "invert": true }
+    }
+  ],
+  "buttons": [
+    { "button": 0, "target": "a" },
+    { "button": 1, "target": "b" },
+    { "button": 2, "target": "x" },
+    { "button": 3, "target": "y" },
+    { "button": 4, "target": "lb" },
+    { "button": 5, "target": "rb" },
+    { "button": 6, "target": "back" },
+    { "button": 7, "target": "start" }
+  ],
+  "axis_buttons": [
+    {
+      "axis": 0,
+      "name": "detent_rewersu",
+      "from": 0.0,
+      "to": 0.05,
+      "target": "dpad_down",
+      "calibration": { "min": -1.0, "max": 1.0, "invert": true }
+    }
+  ]
+}

@@ -110,12 +110,26 @@ class Profile:
                              encoding="utf-8")
 
 
-def load_profile(path: str | Path) -> Profile:
+def _read_json(path: str | Path) -> tuple[dict, Path]:
     path = Path(path)
     if not path.exists():
         raise ConfigError(f"Config file not found: {path}")
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8")), path
     except json.JSONDecodeError as exc:
         raise ConfigError(f"Invalid JSON in {path}: {exc}") from exc
+
+
+def load_profile(path: str | Path) -> Profile:
+    data, path = _read_json(path)
     return Profile(data, path)
+
+
+def load_xbox_profile(path: str | Path):
+    """Load a profile for the Xbox-emulation mode (see xboxmap.py)."""
+    from .xboxmap import XboxProfile
+    data, path = _read_json(path)
+    try:
+        return XboxProfile(data)
+    except (KeyError, ValueError, TypeError) as exc:
+        raise ConfigError(f"Bad xbox profile {path}: {exc}") from exc

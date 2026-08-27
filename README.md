@@ -25,6 +25,9 @@ które gra widzi tak samo jak prawdziwą klawiaturę).
 - **Profile** — osobne pliki JSON dla pojazdów z hamulcem elektrodynamicznym
   (`config/z-ed.json`) i bez niego (`config/bez-ed.json`); łatwo dodać własne.
 - **Tryb testowy** (`--dry-run`) — wypisuje zdarzenia klawiszy zamiast je wysyłać.
+- **Tryb emulacji pada Xbox** — osobny tryb, w którym TCA jest widziana przez
+  system jako wirtualny kontroler Xbox 360 z analogowymi osiami; mapowanie
+  osi i przycisków w pełni konfigurowalne (patrz sekcja niżej).
 
 ## Wymagania
 
@@ -171,6 +174,67 @@ Domyślne profile zakładają typowe bindy SimRail (nastawnik: `Num +` / `Num -`
 kran hamulca: `Num 3` / `Num 9`, czuwak/SHP: `Spacja`). **Sprawdź własne
 ustawienia w grze** (Ustawienia → Sterowanie) i w razie różnic popraw nazwy
 klawiszy w profilu — każdy klawisz jest w pełni konfigurowalny.
+
+## Tryb 2: emulacja pada Xbox 360 (ViGEmBus)
+
+Zamiast wysyłać klawisze, program może wystawić w systemie **wirtualny
+kontroler Xbox 360** zasilany dźwigniami i przyciskami TCA. Gra (albo Steam
+Input) widzi wtedy zwykłego pada z prawdziwymi osiami analogowymi. Przydatne,
+jeśli wolisz bindować sterowanie po stronie gry/Steam Input albo używać
+przepustnicy w innych grach z obsługą pada.
+
+**Instalacja (tylko Windows):**
+
+1. Zainstaluj sterownik **ViGEmBus**:
+   <https://github.com/nefarius/ViGEmBus/releases> (plik `ViGEmBus_*_x64.exe`).
+2. `pip install vgamepad` (instaluje się też automatycznie z `requirements.txt`).
+
+**Uruchomienie:**
+
+```bat
+python -m simrail_tca xbox --config config/xbox.json
+```
+
+albo `run-xbox.bat`. Test bez tworzenia pada: dodaj `--dry-run` (wypisuje stan
+wirtualnego pada). Po uruchomieniu w Windows (Panel sterowania → „Kontrolery
+gier") pojawi się dodatkowy „Xbox 360 Controller".
+
+**Mapowanie (`config/xbox.json`)** — wszystko konfigurowalne samodzielnie:
+
+```json
+{
+  "device": { "name_contains": "TCA" },
+  "poll_hz": 120,
+  "axes": [
+    { "axis": 0, "target": "left_stick_y", "deadzone": 0.05,
+      "calibration": { "min": -1.0, "max": 1.0, "invert": true } },
+    { "axis": 1, "target": "right_stick_y", "deadzone": 0.05 }
+  ],
+  "buttons": [
+    { "button": 0, "target": "a" },
+    { "button": 4, "target": "lb" }
+  ],
+  "axis_buttons": [
+    { "axis": 0, "from": 0.0, "to": 0.05, "target": "dpad_down" }
+  ]
+}
+```
+
+| Sekcja | Opis |
+|---|---|
+| `axes` → `target` | cel analogowy: `left_stick_x`, `left_stick_y`, `right_stick_x`, `right_stick_y`, `left_trigger`, `right_trigger` |
+| `axes` → `deadzone` | martwa strefa wokół środka drążka (0–0.5); nie dotyczy triggerów |
+| `buttons` → `target` | przycisk pada: `a`, `b`, `x`, `y`, `lb`, `rb`, `back`, `start`, `guide`, `ls`, `rs`, `dpad_up`, `dpad_down`, `dpad_left`, `dpad_right` |
+| `axis_buttons` | zakres osi działający jak wciśnięty przycisk pada — np. detent rewersu na dole zakresu dźwigni trzyma `dpad_down` |
+| `calibration` | jak w trybie klawiaturowym (`min`/`max`/`invert`) |
+
+Numery osi/przycisków TCA sprawdzisz tak samo jak w trybie klawiaturowym:
+`python -m simrail_tca monitor --config config/bez-ed.json`.
+
+> **Uwaga:** SimRail nie mapuje analogowych osi pada bezpośrednio na nastawnik —
+> do sterowania jazdą w SimRail zwykle lepszy jest tryb klawiaturowy (`run`).
+> Tryb pada przydaje się do bindowania przycisków po stronie gry, do Steam
+> Input oraz do innych symulatorów, które obsługują osie kontrolera.
 
 ## Rozwiązywanie problemów
 
