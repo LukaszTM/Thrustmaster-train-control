@@ -1,0 +1,131 @@
+================================================================
+  SimRail <-> Thrustmaster TCA  —  INSTRUKCJA INSTALACJI I KONFIGURACJI
+================================================================
+
+Program pozwala sterowac pociagami w SimRail przepustnica Thrustmaster TCA
+(np. TCA Captain Pack X Airbus Edition). Odczytuje dzwignie i przyciski
+kontrolera i wysyla do gry nacisniecia klawiszy — tak, jakbys wcisnal je
+na klawiaturze.
+
+----------------------------------------------------------------
+1. INSTALACJA
+----------------------------------------------------------------
+
+1.1. Zainstaluj Pythona 3.9 lub nowszego:
+     https://www.python.org/downloads/
+     WAZNE: przy instalacji zaznacz "Add Python to PATH".
+
+1.2. Rozpakuj ten ZIP do dowolnego folderu,
+     np. C:\Gry\Thrustmaster-train-control
+
+1.3. Otworz w tym folderze wiersz polecen (w Eksploratorze wpisz "cmd"
+     w pasku adresu) i zainstaluj zaleznosci:
+
+         pip install -r requirements.txt
+
+1.4. (Opcjonalnie — tylko dla trybu "wirtualny pad Xbox")
+     Zainstaluj sterownik ViGEmBus:
+     https://github.com/nefarius/ViGEmBus/releases
+     (plik ViGEmBus_*_x64.exe)
+
+----------------------------------------------------------------
+2. PIERWSZA KONFIGURACJA (jednorazowo)
+----------------------------------------------------------------
+
+2.1. Podlacz przepustnice TCA i sprawdz, czy jest widoczna:
+
+         python -m simrail_tca devices
+
+     Powinna pojawic sie nazwa w stylu "TCA Quadrant Airbus Edition".
+     Jesli nazwa NIE zawiera "TCA" — otworz plik profilu (config\bez-ed.json)
+     w Notatniku i wpisz fragment tej nazwy w polu "name_contains".
+
+2.2. Ustal numery osi i przyciskow (poruszaj dzwigniami, wciskaj przyciski):
+
+         python -m simrail_tca monitor --config config\bez-ed.json
+
+     Zanotuj, ktora dzwignia to ktora os (a0, a1...) i ktore przyciski
+     maja ktore numery. Wpisz te numery w polach "axis" i "button"
+     w pliku profilu.
+
+2.3. Skalibruj osie (zapisuje zakres i kierunek dzwigni do profilu):
+
+         python -m simrail_tca calibrate --config config\bez-ed.json
+
+     Dla kazdej osi: przesun dzwignie w pelnym zakresie, zostaw ja
+     w pozycji minimalnej (jalowej) i nacisnij Enter.
+
+2.4. Dopasuj klawisze do swoich ustawien w grze!
+     Profile zakladaja typowe bindy SimRail:
+        nastawnik:      Num +  /  Num -
+        kran hamulca:   Num 3 (hamowanie) / Num 9 (luzowanie)
+        czuwak/SHP:     Spacja
+     Sprawdz w grze: Ustawienia -> Sterowanie. Jesli masz inne klawisze,
+     popraw nazwy w pliku profilu (lista nazw klawiszy: README.md,
+     sekcja "Nazwy klawiszy").
+
+2.5. Przetestuj bez gry (zdarzenia sa tylko wypisywane):
+
+         python -m simrail_tca run --config config\bez-ed.json --dry-run -v
+
+----------------------------------------------------------------
+3. CODZIENNE UZYWANIE
+----------------------------------------------------------------
+
+Najprosciej: dwuklik na  gui.bat  — otworzy sie okno, w ktorym wybierasz
+tryb pracy i profil, i klikasz Start.
+
+Albo z konsoli:
+    run.bat                      — pojazdy BEZ hamulca ED (EU07, EP07/08, ET22)
+    run.bat config\z-ed.json     — pojazdy Z hamulcem ED (Elf, Dragon2, Traxx)
+    run-xbox.bat                 — tryb wirtualnego pada Xbox (wymaga ViGEmBus)
+
+WAZNE przy trybie skokowym (nastawnik EU07):
+Program zaczyna od pozycji 0 — przed startem ustaw nastawnik w grze na 0.
+Jesli sie "rozjedzie": ustaw nastawnik w grze na 0 i wcisnij przycisk
+z akcja "resync" (domyslnie przycisk nr 4 w profilu bez-ed).
+
+----------------------------------------------------------------
+4. KTORY PROFIL WYBRAC?
+----------------------------------------------------------------
+
+config\bez-ed.json — EU07, EP07, EP08, ET22, ET41:
+    dzwignia 1 = nastawnik skokowy (44 pozycje)
+    dzwignia 2 = kran hamulca zespolonego
+    przyciski  = czuwak, syrena, hamulec dodatkowy (Num1/Num7), resync
+
+config\z-ed.json — EN76/EN96 Elf, ET25 Dragon2, E186 Traxx:
+    dzwignia 1 = zadajnik jazdy i hamowania ED
+                 (do przodu = moc, do tylu = redukcja i hamowanie ED)
+    dzwignia 2 = kran hamulca pneumatycznego (zatrzymanie / awaryjnie)
+
+config\xbox.json — tryb wirtualnego pada Xbox 360:
+    osie -> drazki/triggery pada, przyciski -> przyciski pada,
+    wszystko mapujesz samodzielnie w tym pliku
+    (cele: left_stick_x/y, right_stick_x/y, left_trigger, right_trigger,
+     a, b, x, y, lb, rb, back, start, guide, ls, rs, dpad_*).
+
+----------------------------------------------------------------
+5. NAJCZESTSZE PROBLEMY
+----------------------------------------------------------------
+
+* Gra nie reaguje na klawisze
+  -> uruchom program jako administrator (jesli SimRail dziala jako
+     administrator); okno gry musi byc aktywne.
+
+* Gra gubi czesc nacisniec przy szybkim ruchu dzwignia
+  -> w profilu zwieksz "key_tap_ms" i "key_gap_ms" (np. na 60 i 80).
+
+* Dzwignia dziala odwrotnie
+  -> zmien "invert" w sekcji "calibration" albo powtorz kalibracje.
+
+* Program nie widzi kontrolera
+  -> sprawdz "python -m simrail_tca devices"; w Steam wylacz Steam Input
+     dla SimRail (Wlasciwosci -> Kontroler -> Wylacz Steam Input).
+
+* Blad "vgamepad is not installed" / brak wirtualnego pada
+  -> zainstaluj sterownik ViGEmBus (punkt 1.4) i wykonaj:
+     pip install vgamepad
+
+Wiecej szczegolow: README.md
+================================================================
