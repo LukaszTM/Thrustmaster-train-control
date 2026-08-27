@@ -30,8 +30,9 @@ class BasePad:
 class DryRunPad(BasePad):
     """Prints state changes instead of emulating a pad."""
 
-    def __init__(self) -> None:
+    def __init__(self, log=print) -> None:
         self._last: PadState | None = None
+        self.log = log
 
     def apply(self, state: PadState) -> None:
         if self._last is not None and state == self._last:
@@ -39,7 +40,7 @@ class DryRunPad(BasePad):
         sticks = "  ".join(f"{k}:{v:+6d}" for k, v in state.sticks.items())
         triggers = "  ".join(f"{k}:{v:3d}" for k, v in state.triggers.items())
         buttons = ",".join(sorted(state.buttons)) or "-"
-        print(f"[dry-run] {sticks}  {triggers}  buttons: {buttons}")
+        self.log(f"[dry-run] {sticks}  {triggers}  buttons: {buttons}")
         self._last = PadState(dict(state.sticks), dict(state.triggers),
                               set(state.buttons))
 
@@ -95,23 +96,25 @@ class VigemPad(BasePad):
         self.pad.update()
 
 
-def make_pad(dry_run: bool = False) -> BasePad:
+def make_pad(dry_run: bool = False, log=print) -> BasePad:
     if dry_run:
-        return DryRunPad()
+        return DryRunPad(log=log)
     return VigemPad()
 
 
-def run_xbox_loop(profile: XboxProfile, device: "Device", pad: BasePad) -> None:
+def run_xbox_loop(profile: XboxProfile, device: "Device", pad: BasePad,
+                  stop_event=None, log=print) -> None:
     interval = 1.0 / profile.poll_hz
-    print(f"Connected: {device.name} "
-          f"({device.num_axes} axes, {device.num_buttons} buttons)")
-    print("Virtual Xbox 360 pad active. Ctrl+C to stop.")
+    log(f"Connected: {device.name} "
+        f"({device.num_axes} axes, {device.num_buttons} buttons)")
+    log("Virtual Xbox 360 pad active.")
     try:
-        while True:
+        while stop_event is None or not stop_event.is_set():
             axes, buttons = device.poll()
             pad.apply(profile.compute(axes, buttons))
             time.sleep(interval)
     except KeyboardInterrupt:
-        print("\nStopping.")
+        pass
     finally:
         pad.reset()
+        log("Stopped.")

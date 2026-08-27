@@ -61,6 +61,27 @@ każdą pozycję różnicy wysyła jedno naciśnięcie klawisza. Jeśli wolisz s
 strefowe („dźwignia do przodu = klawisz trzymany"), zmień `mode` na `zones` jak
 w profilu `z-ed.json`.
 
+## GUI
+
+Najprościej uruchomić program przez okienko:
+
+```bat
+python -m simrail_tca gui
+```
+
+albo dwuklikiem na **`gui.bat`** (uruchamia bez okna konsoli). W oknie wybierasz:
+
+- **Tryb pracy** — klawiatura → SimRail (zalecany) albo wirtualny pad Xbox,
+- **Profil** — lista plików z katalogu `config/` (dla trybu klawiatury ukrywane
+  są profile xbox i odwrotnie),
+- **Tryb testowy** — zdarzenia trafiają do logu zamiast do gry,
+- **Szczegółowe logi** — pokazuje każdą zmianę pozycji nastawnika.
+
+Przycisk **Urządzenia** wypisuje wykryte kontrolery, **Start/Stop** uruchamia
+i zatrzymuje mostek (przy zatrzymaniu wszystkie klawisze są zwalniane).
+Kalibrację i identyfikację numerów osi nadal robi się z konsoli
+(`calibrate` / `monitor` — patrz niżej).
+
 ## Pierwsze uruchomienie — krok po kroku
 
 **1. Sprawdź, czy kontroler jest widoczny:**

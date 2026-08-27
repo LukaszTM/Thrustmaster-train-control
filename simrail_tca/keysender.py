@@ -81,17 +81,18 @@ class BaseSender:
 class DryRunSender(BaseSender):
     """Prints key events instead of sending them (testing / non-Windows)."""
 
-    def __init__(self) -> None:
+    def __init__(self, log=print) -> None:
         self.held: set[str] = set()
+        self.log = log
 
     def press(self, key: str) -> None:
         validate_key(key)
         self.held.add(key)
-        print(f"[dry-run] press   {key}")
+        self.log(f"[dry-run] press   {key}")
 
     def release(self, key: str) -> None:
         self.held.discard(key)
-        print(f"[dry-run] release {key}")
+        self.log(f"[dry-run] release {key}")
 
     def release_all(self) -> None:
         for key in list(self.held):
@@ -155,7 +156,7 @@ if sys.platform == "win32":
                 self.release(key)
 
 
-def make_sender(dry_run: bool = False) -> BaseSender:
+def make_sender(dry_run: bool = False, log=print) -> BaseSender:
     if dry_run or sys.platform != "win32":
-        return DryRunSender()
+        return DryRunSender(log=log)
     return WindowsSender()

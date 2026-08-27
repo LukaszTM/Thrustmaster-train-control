@@ -1,6 +1,7 @@
 """Command line interface.
 
 Usage:
+    python -m simrail_tca gui
     python -m simrail_tca devices
     python -m simrail_tca monitor  [--config config/bez-ed.json]
     python -m simrail_tca calibrate --config config/bez-ed.json
@@ -44,6 +45,8 @@ def main(argv: list[str] | None = None) -> int:
                        help="Print key events instead of sending them")
     p_run.add_argument("-v", "--verbose", action="store_true")
 
+    sub.add_parser("gui", help="Open the graphical interface")
+
     p_xbox = sub.add_parser(
         "xbox",
         help="Emulate a virtual Xbox 360 pad (ViGEmBus) fed by the TCA",
@@ -55,6 +58,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     try:
+        if args.command == "gui":
+            from .gui import main as gui_main
+            return gui_main()
         if args.command == "devices":
             from .joystick import list_devices
             devices = list_devices()

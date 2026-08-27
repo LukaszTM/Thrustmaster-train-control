@@ -64,18 +64,18 @@ class HoldManager:
         self.apply(set())
 
 
-def run_loop(profile: Profile, device: Device, sender: BaseSender,
-             verbose: bool = False) -> None:
+def run_loop(profile: Profile, device: "Device", sender: BaseSender,
+             verbose: bool = False, stop_event=None, log=print) -> None:
     taps = TapQueue(sender, profile.key_tap_ms, profile.key_gap_ms)
     holds = HoldManager(sender)
     notched_by_name = {ax.name: ax for ax in profile.notched_axes.values()}
     interval = 1.0 / profile.poll_hz
 
-    print(f"Connected: {device.name} "
-          f"({device.num_axes} axes, {device.num_buttons} buttons)")
-    print("Mapping active. Ctrl+C to stop.")
+    log(f"Connected: {device.name} "
+        f"({device.num_axes} axes, {device.num_buttons} buttons)")
+    log("Mapping active.")
     try:
-        while True:
+        while stop_event is None or not stop_event.is_set():
             now = time.monotonic()
             axes, buttons = device.poll()
 
@@ -87,8 +87,8 @@ def run_loop(profile: Profile, device: Device, sender: BaseSender,
                 for tap in mapper.update(axes[axis_id]):
                     taps.add(tap.key)
                     if verbose:
-                        print(f"{mapper.name}: notch -> {mapper.current_notch} "
-                              f"(tap {tap.key})")
+                        log(f"{mapper.name}: notch -> {mapper.current_notch} "
+                            f"(tap {tap.key})")
 
             for axis_id, mapper in profile.zones_axes.items():
                 if axis_id >= len(axes):
@@ -104,7 +104,7 @@ def run_loop(profile: Profile, device: Device, sender: BaseSender,
                 for key in result["taps"]:
                     taps.add(key)
                     if verbose:
-                        print(f"{mapping.name}: tap {key}")
+                        log(f"{mapping.name}: tap {key}")
                 if result["hold"]:
                     wanted_holds.add(result["hold"])
                 if result["resync"]:
@@ -112,17 +112,18 @@ def run_loop(profile: Profile, device: Device, sender: BaseSender,
                     target = notched_by_name.get(axis_name)
                     if target:
                         target.resync(notch)
-                        print(f"{mapping.name}: resync '{axis_name}' -> notch {notch}")
+                        log(f"{mapping.name}: resync '{axis_name}' -> notch {notch}")
 
             holds.apply(wanted_holds)
             taps.tick(now)
 
             time.sleep(interval)
     except KeyboardInterrupt:
-        print("\nStopping.")
+        pass
     finally:
         holds.release_all()
         sender.release_all()
+        log("Stopped.")
 
 
 def monitor_loop(device: Device) -> None:
